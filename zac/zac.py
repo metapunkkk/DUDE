@@ -165,6 +165,29 @@ class ZAC(Scheduler_mixin, Placer_mixin, Router_mixin, Verifier_mixin, Animator)
                     if ins.qubits[0]._register != None:
                         offset = register_idx[ins.qubits[0]._register]
                     q0 = offset + ins.qubits[0]._index
+
+                    # Extract parameters for the gate.
+                    # For U3, we expect three parameters: theta, phi, lambda.
+                    if ins.operation.name.lower() == "u3":
+                        try:
+                            theta, phi, lam = ins.operation.params
+                        except Exception as e:
+                            # In case the parameters are not as expected, default to None.
+                            theta = phi = lam = None
+                        params = {"theta": theta, "phi": phi, "lambda": lam}
+                    else:
+                        # For other gates, you might simply store the raw parameters,
+                        # or handle them as needed.
+                        params = ins.operation.params if hasattr(ins.operation, "params") else None
+
+                    # Record the single-qubit gate as a dictionary including its parameters.
+                    gate_record = {
+                        "name": ins.operation.name,
+                        "q": q0,
+                        "params": params
+                    }
+
+                    parent_key = list_qubit_last_2q_gate[q0]
                     if list_qubit_last_2q_gate[q0] not in self.dict_g_1q_parent:
                         self.dict_g_1q_parent[list_qubit_last_2q_gate[q0]] = []    
                     self.dict_g_1q_parent[list_qubit_last_2q_gate[q0]].append((ins.operation.name, q0))
