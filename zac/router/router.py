@@ -467,7 +467,7 @@ class Router_mixin:
     def write_1q_gate_instruction(self, inst_idx: int, result_gate: list, dependency: dict, gate_mapping: list):
         locs = []
         for gate in result_gate:
-            locs.append((gate["q"], gate_mapping[gate["q"]][0], gate_mapping[gate["q"]][1], gate_mapping[gate["q"]][2]))
+            locs.append((gate["q"], gate_mapping[gate["q"]][0], gate_mapping[gate["q"]][1], gate_mapping[gate["q"]][2]), "params": gate.get("params", None))
 
         self.result_json['instructions'].append(
             {
